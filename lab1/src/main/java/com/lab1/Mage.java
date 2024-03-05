@@ -1,6 +1,6 @@
 package com.lab1;
 
-import java.util.Comparator;
+import java.util.Map;
 import java.util.Set;
 
 public class Mage implements Comparable<Mage> {
@@ -25,6 +25,18 @@ public class Mage implements Comparable<Mage> {
         else {
             this.apprentices = new java.util.HashSet<>();
         }
+    }
+
+    public Integer getNumberOfApprentices(Map<Mage, Integer> map) {
+        Integer apprenticesCount = 0;
+        for (Mage apprentice : apprentices) {
+            apprenticesCount++;
+            apprenticesCount += apprentice.getNumberOfApprentices(map);
+        }
+
+        map.put(this, apprenticesCount);
+
+        return apprenticesCount;
     }
 
     public String toString() {

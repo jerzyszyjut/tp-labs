@@ -1,9 +1,13 @@
 package com.lab1;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Main {
     public static void main(String[] args) {
         boolean isSorted;
         MageComparator comparator;
+        Map<Mage, Integer> map = new HashMap<>();
 
         if (args.length == 0) {
             isSorted = false;
@@ -44,5 +48,10 @@ public class Main {
         mage1.apprentices.add(mage10);
 
         mage1.print(0);
+        System.out.println(mage1.getNumberOfApprentices(map));
+
+        for (Map.Entry<Mage, Integer> entry : map.entrySet()) {
+            System.out.println(entry.getKey() + " " + entry.getValue());
+        }
     }
 }
