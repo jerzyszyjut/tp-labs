@@ -11,8 +11,7 @@ public class CalculationThread implements Runnable {
 
     @Override
     public void run() {
-        boolean running = true;
-        while (running) {
+        while (!Thread.currentThread().isInterrupted()) {
             try {
                 int number = taskManager.getTask();
                 boolean isPrime = true;
@@ -26,7 +25,8 @@ public class CalculationThread implements Runnable {
                 String result = number + " " + (isPrime ? "jest" : "nie jest") + " liczbą pierwszą";
                 resultManager.addResult(result);
             } catch (InterruptedException e) {
-                running = false;
+                System.out.println("Wątek został przerwany");
+                break;
             }
         }
     }
