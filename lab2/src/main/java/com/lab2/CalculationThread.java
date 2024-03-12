@@ -12,20 +12,24 @@ public class CalculationThread implements Runnable {
     @Override
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
+            long number = 0;
             try {
-                int number = taskManager.getTask();
-                boolean isPrime = true;
-                for (int i = 2; i < number; i++) {
+                number = taskManager.getTask();
+                System.out.println(number);
+                StringBuilder sb = new StringBuilder();
+                sb.append(number).append(": ");
+                for (long i = 1; i < number; i++) {
                     if (number % i == 0) {
-                        isPrime = false;
-                        break;
+                        sb.append(i).append(", ");
                     }
                 }
-                Thread.sleep(10000);
-                String result = number + " " + (isPrime ? "jest" : "nie jest") + " liczbą pierwszą";
-                resultManager.addResult(result);
+                sb.append(number);
+                resultManager.addResult(sb.toString());
             } catch (InterruptedException e) {
-                System.out.println("Wątek został przerwany");
+                StringBuilder sb = new StringBuilder();
+                if(number != 0) sb.append("Watek zostal przerwany, ostatnia liczba: ").append(number);
+                else sb.append("Watek zostal przerwany");
+                System.out.println(sb.toString());
                 break;
             }
         }
