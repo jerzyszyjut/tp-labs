@@ -3,14 +3,14 @@ package com.lab2;
 import java.util.LinkedList;
 
 public class TaskManager {
-    private final LinkedList<Integer> numberToChecks = new LinkedList<>();
+    private final LinkedList<Long> numberToChecks = new LinkedList<>();
 
-    public synchronized void addTask(int numberToCheck) {
+    public synchronized void addTask(long numberToCheck) {
         numberToChecks.add(numberToCheck);
         notify();
     }
 
-    public synchronized int getTask() throws InterruptedException {
+    public synchronized long getTask() throws InterruptedException {
         while (numberToChecks.isEmpty()) {
             wait();
         }
