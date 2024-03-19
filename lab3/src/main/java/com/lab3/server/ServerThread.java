@@ -3,25 +3,26 @@ package com.lab3.server;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.util.logging.Logger;
 
 import com.lab3.protocol.Message;
 import com.lab3.protocol.Protocol;
 
 public class ServerThread implements Runnable {
-    ObjectOutputStream outputStream;
-    ObjectInputStream inputStream;
-    Logger LOGGER;
+    private static final Logger LOGGER = Logger.getLogger(Server.class.getName());
+    Socket socket;
 
-    public ServerThread(ObjectOutputStream outputStream, ObjectInputStream inputStream, Logger LOGGER) {
-        this.outputStream = outputStream;
-        this.inputStream = inputStream;
-        this.LOGGER = LOGGER;
+    public ServerThread(Socket socket) {
+        this.socket = socket;
     }
 
     @Override
     public void run() {
         try {
+            ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
+            ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+
             outputStream.writeObject(Protocol.READY);
 
             int n = inputStream.readInt();
@@ -35,6 +36,8 @@ public class ServerThread implements Runnable {
             }
 
             outputStream.writeObject(Protocol.FINISHED);
+
+            socket.close();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
