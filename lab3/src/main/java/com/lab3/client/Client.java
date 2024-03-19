@@ -33,7 +33,7 @@ public class Client {
             }
 
             LOGGER.info("Enter a number:");
-            int number = scanner.nextInt();
+            int number = Integer.parseInt(scanner.nextLine());
             outputStream.writeInt(number);
             outputStream.flush();
 
@@ -46,7 +46,8 @@ public class Client {
             }
 
             for (int i = 0; i < number; i++) {
-                Message message = new Message(i, "PIWO WIADOMOSC NR " + i);
+                String textMessage = scanner.nextLine();
+                Message message = new Message(i, textMessage);
                 outputStream.writeObject(message);
                 outputStream.flush();
                 LOGGER.info("Sent message to server: " + message.getMessage());
