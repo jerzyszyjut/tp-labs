@@ -1,5 +1,6 @@
 package com.lab4.model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -11,7 +12,7 @@ public class Mage {
 
     private int level;
     
-    @ManyToOne()
+    @ManyToOne(cascade = CascadeType.REFRESH)
     private Tower tower;
 
     public Mage() {
@@ -57,3 +58,4 @@ public class Mage {
                 '}';
     }
 }
+
