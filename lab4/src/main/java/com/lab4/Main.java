@@ -1,5 +1,7 @@
 package com.lab4;
 
+import java.util.Scanner;
+
 import com.lab4.model.Mage;
 import com.lab4.model.Tower;
 
@@ -25,6 +27,29 @@ public class Main
         db.getAllMagesWithPowerHigherThan(90);
         db.getAllTowersWithHeightHigherThan(50);
         db.getAllMagesFromTowerHigherThan(tower_1.getName(), 90);
+
+        boolean flag = true;
+
+        while (flag) {
+            System.out.println("Add wizard");
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Tower: ");
+            String tower = scanner.nextLine().trim();
+            if (db.getTower(tower) != null) {
+                System.out.println("Name: ");
+                String name = scanner.nextLine().trim();
+                System.out.println("Power: ");
+                int power = Integer.parseInt(scanner.nextLine().trim());
+                Mage mage = new Mage(name, power, db.getTower(tower));
+                db.insertMage(mage);
+                flag = false;
+
+                db.deleteMage(name);
+            } else {
+                System.out.println("Tower does not exist");
+            }
+            scanner.close();
+        }
 
         db.dumpDatabase();
 
