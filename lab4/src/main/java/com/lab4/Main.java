@@ -24,10 +24,6 @@ public class Main
         db.insertTower(tower_1);
         db.insertTower(tower_2);
 
-        db.getAllMagesWithPowerHigherThan(90);
-        db.getAllTowersWithHeightHigherThan(50);
-        db.getAllMagesFromTowerHigherThan(tower_1.getName(), 90);
-
         boolean flag = true;
 
         while (flag) {

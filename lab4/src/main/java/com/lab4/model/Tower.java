@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
@@ -15,10 +14,9 @@ public class Tower {
     @Id
     private String name;
 
-    @Column(name = "height")
     private int height;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "tower", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "tower", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Mage> mages;
 
     public Tower() {

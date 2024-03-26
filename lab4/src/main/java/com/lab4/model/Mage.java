@@ -1,7 +1,5 @@
 package com.lab4.model;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -11,10 +9,9 @@ public class Mage {
     @Id
     private String name;
 
-    @Column(name = "level")
     private int level;
     
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne()
     private Tower tower;
 
     public Mage() {

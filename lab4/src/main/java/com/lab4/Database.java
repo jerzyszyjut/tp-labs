@@ -1,259 +1,193 @@
 package com.lab4;
 
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.query.Query;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
 
 import com.lab4.model.Mage;
 import com.lab4.model.Tower;
 
 public class Database {
     private static final Logger LOGGER = Logger.getLogger(Database.class.getName());
-    private static SessionFactory sessionFactory;
+    private static final String PERSISTENCE_UNIT_NAME = "Lab4PersistenceUnit";
+    private static EntityManagerFactory entityManagerFactory;
 
     public Database() {
-        sessionFactory = getSessionFactory();
-    }
-
-    public static SessionFactory getSessionFactory() {
-        if (sessionFactory == null) {
-            try {
-                Configuration configuration = new Configuration().configure();
-                sessionFactory = configuration.buildSessionFactory();
-            } catch (Throwable ex) {
-                LOGGER.log(Level.SEVERE, "Initial SessionFactory creation failed.", ex);
-                throw new ExceptionInInitializerError(ex);
-            }
-        }
-        return sessionFactory;
+        entityManagerFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
     }
 
     public void insertMage(Mage mage) {
-        Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            session.save(mage);
-            transaction.commit();
-            LOGGER.info("Mage inserted successfully: " + mage.getName());
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            LOGGER.log(Level.SEVERE, "Failed to insert Mage: " + mage.getName(), e);
-        }
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+        transaction.begin();
+        entityManager.persist(mage);
+        transaction.commit();
+        LOGGER.info("Mage inserted successfully: " + mage.getName());
+        entityManager.close();
     }
 
     public void insertTower(Tower tower) {
-        Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            session.save(tower);
-            transaction.commit();
-            LOGGER.info("Tower inserted successfully: " + tower.getName());
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            LOGGER.log(Level.SEVERE, "Failed to insert Tower: " + tower.getName(), e);
-        }
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+        transaction.begin();
+        entityManager.persist(tower);
+        transaction.commit();
+        LOGGER.info("Tower inserted successfully: " + tower.getName());
+        entityManager.close();
     }
 
     public void updateMage(Mage mage) {
-        Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            session.update(mage);
-            transaction.commit();
-            LOGGER.info("Mage updated successfully: " + mage.getName());
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            LOGGER.log(Level.SEVERE, "Failed to update Mage: " + mage.getName(), e);
-        }
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+        transaction.begin();
+        entityManager.merge(mage);
+        transaction.commit();
+        LOGGER.info("Mage updated successfully: " + mage.getName());
+        entityManager.close();
     }
 
     public void updateTower(Tower tower) {
-        Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            session.update(tower);
-            transaction.commit();
-            LOGGER.info("Tower updated successfully: " + tower.getName());
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            LOGGER.log(Level.SEVERE, "Failed to update Tower: " + tower.getName(), e);
-        }
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+        transaction.begin();
+        entityManager.merge(tower);
+        transaction.commit();
+        LOGGER.info("Tower updated successfully: " + tower.getName());
+        entityManager.close();
     }
 
     public Mage getMage(String name) {
-        try (Session session = sessionFactory.openSession()) {
-            return session.get(Mage.class, name);
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to retrieve Mage: " + name, e);
-            return null;
-        }
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        Mage mage = entityManager.find(Mage.class, name);
+        entityManager.close();
+        return mage;
     }
 
     public Tower getTower(String name) {
-        try (Session session = sessionFactory.openSession()) {
-            return session.get(Tower.class, name);
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to retrieve Tower: " + name, e);
-            return null;
-        }
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        Tower tower = entityManager.find(Tower.class, name);
+        entityManager.close();
+        return tower;
     }
 
     public void deleteMage(String name) {
-        Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            Mage mage = session.get(Mage.class, name);
-            if (mage != null) {
-                session.delete(mage);
-                LOGGER.info("Mage deleted successfully: " + name);
-            } else {
-                LOGGER.warning("Mage not found with name: " + name);
-            }
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            LOGGER.log(Level.SEVERE, "Failed to delete Mage: " + name, e);
-        }
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+        transaction.begin();
+        Mage mage = entityManager.find(Mage.class, name);
+        entityManager.remove(mage);
+        transaction.commit();
+        LOGGER.info("Mage deleted successfully: " + name);
+        entityManager.close();
     }
 
     public void deleteTower(String name) {
-        Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            Tower tower = session.get(Tower.class, name);
-            if (tower != null) {
-                session.delete(tower);
-                LOGGER.info("Tower deleted successfully: " + name);
-            } else {
-                LOGGER.warning("Tower not found with name: " + name);
-            }
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            LOGGER.log(Level.SEVERE, "Failed to delete Tower: " + name, e);
-        }
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+        transaction.begin();
+        Tower tower = entityManager.find(Tower.class, name);
+        entityManager.remove(tower);
+        transaction.commit();
+        LOGGER.info("Tower deleted successfully: " + name);
+        entityManager.close();
     }
 
     public void logDatabase() {
-        try (Session session = sessionFactory.openSession()) {
-            List<Mage> mages = session.createQuery("FROM Mage", Mage.class).getResultList();
-            LOGGER.info("Mages in the database:");
-            for (Mage mage : mages) {
-                LOGGER.info(mage.toString());
-            }
-            List<Tower> towers = session.createQuery("FROM Tower", Tower.class).getResultList();
-            LOGGER.info("Towers in the database:");
-            for (Tower tower : towers) {
-                LOGGER.info(tower.toString());
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to log database", e);
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        
+        Query mageQuery = entityManager.createQuery("SELECT m FROM Mage m");
+        List<Mage> mages = mageQuery.getResultList();
+        LOGGER.info("Mages in the database:");
+        for (Mage mage : mages) {
+            LOGGER.info(mage.toString());
         }
+        
+        Query towerQuery = entityManager.createQuery("SELECT t FROM Tower t");
+        List<Tower> towers = towerQuery.getResultList();
+        LOGGER.info("Towers in the database:");
+        for (Tower tower : towers) {
+            LOGGER.info(tower.toString());
+        }
+        
+        entityManager.close();
     }
 
     public void clearDatabase() {
-        Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            Query<Mage> mageQuery = session.createQuery("DELETE FROM Mage");
-            int mageDeletedCount = mageQuery.executeUpdate();
-            LOGGER.info("Deleted " + mageDeletedCount + " Mages.");
-            Query<Tower> towerQuery = session.createQuery("DELETE FROM Tower");
-            int towerDeletedCount = towerQuery.executeUpdate();
-            LOGGER.info("Deleted " + towerDeletedCount + " Towers.");
-
-            transaction.commit();
-            LOGGER.info("Database cleared successfully.");
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            LOGGER.log(Level.SEVERE, "Failed to clear database", e);
-        }
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        
+        // Clear Mages
+        Query mageClearQuery = entityManager.createQuery("DELETE FROM Mage");
+        mageClearQuery.executeUpdate();
+        
+        // Clear Towers
+        Query towerClearQuery = entityManager.createQuery("DELETE FROM Tower");
+        towerClearQuery.executeUpdate();
+        
+        entityManager.getTransaction().commit();
+        entityManager.close();
+        
+        LOGGER.info("Database cleared.");
     }
 
     public void dumpDatabase() {
-        try (Session session = sessionFactory.openSession()) {
-            List<Mage> mages = session.createQuery("FROM Mage", Mage.class).getResultList();
-            LOGGER.info("Dumping Mages from the database:");
-            for (Mage mage : mages) {
-                LOGGER.info(mage.toString());
-            }
-            List<Tower> towers = session.createQuery("FROM Tower", Tower.class).getResultList();
-            LOGGER.info("Dumping Towers from the database:");
-            for (Tower tower : towers) {
-                LOGGER.info(tower.toString());
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to dump database", e);
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        
+        // Dump Mages
+        Query mageQuery = entityManager.createQuery("SELECT m FROM Mage m");
+        List<Mage> mages = mageQuery.getResultList();
+        LOGGER.info("Dumping Mages from the database:");
+        for (Mage mage : mages) {
+            LOGGER.info(mage.toString());
         }
+        
+        // Dump Towers
+        Query towerQuery = entityManager.createQuery("SELECT t FROM Tower t");
+        List<Tower> towers = towerQuery.getResultList();
+        LOGGER.info("Dumping Towers from the database:");
+        for (Tower tower : towers) {
+            LOGGER.info(tower.toString());
+        }
+        
+        entityManager.close();
+    }
+
+    public List<Mage> getAllMagesWithPowerHigherThan(int power) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        Query query = entityManager.createQuery("SELECT m FROM Mage m WHERE m.power > :power", Mage.class);
+        query.setParameter("power", power);
+        List<Mage> mages = query.getResultList();
+        entityManager.close();
+        return mages;
+    }
+
+    public List<Tower> getAllTowersWithHeightHigherThan(int height) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        Query query = entityManager.createQuery("SELECT t FROM Tower t WHERE t.height > :height", Tower.class);
+        query.setParameter("height", height);
+        List<Tower> towers = query.getResultList();
+        entityManager.close();
+        return towers;
+    }
+
+    public List<Mage> getAllMagesFromTowerHigherThan(String towerName, int power) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        Query query = entityManager.createQuery("SELECT m FROM Mage m WHERE m.tower.name = :towerName AND m.power > :power");
+        query.setParameter("towerName", towerName);
+        query.setParameter("power", power);
+        List<Mage> mages = query.getResultList();
+        entityManager.close();
+        return mages;
     }
 
     public void shutdown() {
-        if (sessionFactory != null) {
-            sessionFactory.close();
-            LOGGER.info("SessionFactory closed successfully.");
-        }
-    }
-
-    public void getAllMagesWithPowerHigherThan(int power) {
-        try (Session session = sessionFactory.openSession()) {
-            Query<Mage> query = session.createQuery("FROM Mage WHERE level > :power", Mage.class);
-            query.setParameter("power", power);
-            List<Mage> mages = query.getResultList();
-            LOGGER.info("Mages with power higher than " + power + ":");
-            for (Mage mage : mages) {
-                LOGGER.info(mage.toString());
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to get Mages with power higher than " + power, e);
-        }
-    }
-
-    public void getAllTowersWithHeightHigherThan(int height) {
-        try (Session session = sessionFactory.openSession()) {
-            Query<Tower> query = session.createQuery("FROM Tower WHERE height > :height", Tower.class);
-            query.setParameter("height", height);
-            List<Tower> towers = query.getResultList();
-            LOGGER.info("Towers with height higher than " + height + ":");
-            for (Tower tower : towers) {
-                LOGGER.info(tower.toString());
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to get Towers with height higher than " + height, e);
-        }
-    }
-
-    public void getAllMagesFromTowerHigherThan(String towerName, int power) {
-        try (Session session = sessionFactory.openSession()) {
-            Query<Mage> query = session.createQuery("FROM Mage WHERE tower.name = :towerName AND level > :power", Mage.class);
-            query.setParameter("towerName", towerName);
-            query.setParameter("power", power);
-            List<Mage> mages = query.getResultList();
-            LOGGER.info("Mages from Tower " + towerName + " with power higher than " + power + ":");
-            for (Mage mage : mages) {
-                LOGGER.info(mage.toString());
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to get Mages from Tower " + towerName + " with power higher than " + power, e);
+        if (entityManagerFactory != null && entityManagerFactory.isOpen()) {
+            entityManagerFactory.close();
+            LOGGER.info("EntityManagerFactory closed successfully.");
         }
     }
 }
