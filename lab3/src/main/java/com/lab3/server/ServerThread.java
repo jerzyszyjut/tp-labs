@@ -25,14 +25,19 @@ public class ServerThread implements Runnable {
 
             outputStream.writeObject(Protocol.READY);
 
-            int n = inputStream.readInt();
-            LOGGER.info("Received number from client: " + n);
+            // int n = inputStream.readInt();
+            // LOGGER.info("Received number from client: " + n);
 
             outputStream.writeObject(Protocol.READY_FOR_MESSAGES);
+            boolean flag = true;
 
-            for (int i = 0; i < n; i++) {
+            while(flag) {
                 Message message = (Message) inputStream.readObject();
                 LOGGER.info("Received message from client: " + message.getMessage());
+                outputStream.writeObject(message);
+                outputStream.flush();
+                LOGGER.info("Sent message to client: " + message.getMessage());
+                if(message.getMessage().toString().equals("exit")) flag = false;
             }
 
             outputStream.writeObject(Protocol.FINISHED);
