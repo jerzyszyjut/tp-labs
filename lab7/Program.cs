@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace lab7
 {
@@ -19,15 +19,15 @@ namespace lab7
 
             DisplayDirectoryContentWithIndentation(directory);
 
-            DateTime oldestFileDate = directory.GetOldestFileDate();
-            Console.WriteLine($"\nNajstarszy plik: {oldestFileDate}");
+            DateTime oldestFileDate = directory.GetNewestFileDate();
+            Console.WriteLine($"\nNajmłodszy plik: {oldestFileDate}");
 
             var sortedCollection = LoadDirectoryContentsToSortedCollection(directory);
             DisplaySortedCollection(sortedCollection);
 
             SerializeAndDeserializeCollection(sortedCollection);
 
-            Console.ReadKey();
+            //Console.ReadKey();
         }
 
         static void DisplayDirectoryContentWithIndentation(DirectoryInfo directory, int level = 0)
@@ -40,16 +40,16 @@ namespace lab7
             }
             foreach (var subDirectory in directory.GetDirectories())
             {
-                Console.WriteLine($"{indentation}{subDirectory.Name} ({subDirectory.GetFiles("*.*", SearchOption.AllDirectories).Length}) {GetDosAttributes(subDirectory)}");
+                Console.WriteLine($"{indentation}{subDirectory.Name} ({subDirectory.GetFiles().Length + subDirectory.GetDirectories().Length}) {GetDosAttributes(subDirectory)}");
                 DisplayDirectoryContentWithIndentation(subDirectory, level + 1);
             }
         }
 
-        static DateTime GetOldestFileDate(this DirectoryInfo directory)
+        static DateTime GetNewestFileDate(this DirectoryInfo directory)
         {
             return directory.GetFiles("*.*", SearchOption.AllDirectories)
                 .Select(file => file.LastWriteTime)
-                .OrderBy(date => date)
+                .OrderByDescending(date => date)
                 .FirstOrDefault();
         }
 
