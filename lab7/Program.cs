@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace ConsoleApp
+namespace lab7
 {
     static class Program
     {
         static void Main(string[] args)
         {
+            AppContext.SetSwitch("System.Runtime.Serialization.EnableUnsafeBinaryFormatterSerialization", true);
+
             if (args.Length == 0 || !Directory.Exists(args[0]))
             {
                 Console.WriteLine("Podaj poprawną ścieżkę do katalogu jako parametr wywołania programu.");
@@ -21,15 +19,15 @@ namespace ConsoleApp
 
             DisplayDirectoryContentWithIndentation(directory);
 
-            DateTime oldestFileDate = directory.GetOldestFileDate();
-            Console.WriteLine($"\nNajstarszy plik: {oldestFileDate}");
+            DateTime oldestFileDate = directory.GetNewestFileDate();
+            Console.WriteLine($"\nNajmłodszy plik: {oldestFileDate}");
 
             var sortedCollection = LoadDirectoryContentsToSortedCollection(directory);
             DisplaySortedCollection(sortedCollection);
 
             SerializeAndDeserializeCollection(sortedCollection);
 
-            Console.ReadKey();
+            //Console.ReadKey();
         }
 
         static void DisplayDirectoryContentWithIndentation(DirectoryInfo directory, int level = 0)
@@ -38,24 +36,24 @@ namespace ConsoleApp
             for (int i = 0; i < level; i++) indentation += "\t";
             foreach (var file in directory.GetFiles())
             {
-                Console.WriteLine($"{indentation}{file.Name} {file.Length} bajtów {GetDOSAttributes(file)}");
+                Console.WriteLine($"{indentation}{file.Name} {file.Length} bajtów {GetDosAttributes(file)}");
             }
             foreach (var subDirectory in directory.GetDirectories())
             {
-                Console.WriteLine($"{indentation}{subDirectory.Name} ({subDirectory.GetFiles("*.*", SearchOption.AllDirectories).Length}) {GetDOSAttributes(subDirectory)}");
+                Console.WriteLine($"{indentation}{subDirectory.Name} ({subDirectory.GetFiles().Length + subDirectory.GetDirectories().Length}) {GetDosAttributes(subDirectory)}");
                 DisplayDirectoryContentWithIndentation(subDirectory, level + 1);
             }
         }
 
-        static DateTime GetOldestFileDate(this DirectoryInfo directory)
+        static DateTime GetNewestFileDate(this DirectoryInfo directory)
         {
             return directory.GetFiles("*.*", SearchOption.AllDirectories)
                 .Select(file => file.LastWriteTime)
-                .OrderBy(date => date)
+                .OrderByDescending(date => date)
                 .FirstOrDefault();
         }
 
-        static string GetDOSAttributes(FileSystemInfo fileSystemInfo)
+        static string GetDosAttributes(FileSystemInfo fileSystemInfo)
         {
             string attributes = "";
             if ((fileSystemInfo.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
@@ -103,9 +101,9 @@ namespace ConsoleApp
         [Serializable]
         class FilesComparer : IComparer<string>
         {
-            public int Compare(string x, string y)
+            public int Compare(string? x, string? y)
             {
-                return x.CompareTo(y);
+                return String.Compare(x, y, StringComparison.Ordinal);
             }
         }
 

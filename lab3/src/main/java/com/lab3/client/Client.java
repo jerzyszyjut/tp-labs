@@ -32,10 +32,10 @@ public class Client {
                 return;
             }
 
-            LOGGER.info("Enter a number:");
-            int number = Integer.parseInt(scanner.nextLine());
-            outputStream.writeInt(number);
-            outputStream.flush();
+            // LOGGER.info("Enter a number:");
+            // int number = Integer.parseInt(scanner.nextLine());
+            // outputStream.writeInt(number);
+            // outputStream.flush();
 
             String readyForMessagesSignal = (String) inputStream.readObject();
             
@@ -45,12 +45,18 @@ public class Client {
                 return;
             }
 
-            for (int i = 0; i < number; i++) {
+            boolean flag = true;
+            int i = 0;
+            while (flag) {
                 String textMessage = scanner.nextLine();
                 Message message = new Message(i, textMessage);
                 outputStream.writeObject(message);
                 outputStream.flush();
                 LOGGER.info("Sent message to server: " + message.getMessage());
+                if(message.getMessage().toString().equals("exit")) flag = false;
+                i += 1;
+                Message receivedMessage = (Message) inputStream.readObject();
+                LOGGER.info("Received message from server: " + receivedMessage.getMessage());
             }
 
             String finishedSignal = (String) inputStream.readObject();
